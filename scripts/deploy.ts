@@ -1,30 +1,51 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
-async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+const main = async () => {
+  const gameContractFactory = await ethers.getContractFactory("MyEpicGame");
+  const gameContract = await gameContractFactory.deploy(
+    ["Leo", "Aang", "Pikachu"],
+    [
+      "https://i.imgur.com/pKd5Sdk.png",
+      "https://i.imgur.com/xVu4vFL.png",
+      "https://i.imgur.com/WMB6g9u.png",
+    ],
+    [100, 200, 300],
+    [100, 50, 25],
+    "Elon Musk",
+    "https://i.imgur.com/AksR0tt.png",
+    10000,
+    50
+  );
+  await gameContract.deployed();
+  console.log("Contract deployed to:", gameContract.address);
+  let txn;
+  txn = await gameContract.mintCharacterNFT(0);
+  await txn.wait();
+  console.log("Minted NFT #1");
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  txn = await gameContract.mintCharacterNFT(1);
+  await txn.wait();
+  console.log("Minted NFT #2");
 
-  await greeter.deployed();
+  txn = await gameContract.mintCharacterNFT(2);
+  await txn.wait();
+  console.log("Minted NFT #3");
 
-  console.log("Greeter deployed to:", greeter.address);
-}
+  txn = await gameContract.mintCharacterNFT(1);
+  await txn.wait();
+  console.log("Minted NFT #4");
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.log("Done deploying and minting!");
+};
+
+const runMain = async () => {
+  try {
+    await main();
+    process.exitCode = 0;
+  } catch (error) {
+    console.log(error);
+    process.exitCode = 1;
+  }
+};
+
+runMain();
